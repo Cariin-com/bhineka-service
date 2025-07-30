@@ -5,8 +5,6 @@ from bs4 import BeautifulSoup
 from paginate import get_total_pages_from_soup
 import concurrent.futures
 
-SEARCH_URL = "https://www.bhinneka.com/jual?cari=laptop"
-
 def get_product_links_from_soup(soup):
     product_links = []
     for a in soup.find_all("a", class_="oe_product_image_link"):
@@ -28,7 +26,14 @@ def scrape_all_pages(search_url, max_products_per_page=None):
         all_links = all_links[:max_products_per_page]
 
     for page in range(2, total_pages + 1):
-        page_url = f"https://www.bhinneka.com/jual?page={page}&cari=laptop"
+        # Extract search query from original URL
+        if "cari=" in search_url:
+            base_url = search_url.split("?")[0]
+            query_part = search_url.split("cari=")[1].split("&")[0]
+            page_url = f"{base_url}?page={page}&cari={query_part}"
+        else:
+            page_url = f"{search_url}&page={page}"
+        
         print(f"Scraping page {page}: {page_url}")
         html = requests.get(page_url, headers={"User-Agent": "Mozilla/5.0"}).text
         soup = BeautifulSoup(html, "html.parser")
@@ -67,7 +72,11 @@ def scrape_search_results(search_url, max_products=10, all_pages=False, max_work
     return products
 
 if __name__ == "__main__":
+    # Example usage with dynamic search query
+    search_query = "laptop"  # Can be changed to any product
+    search_url = f"https://www.bhinneka.com/jual?cari={search_query}"
+    
     # Set all_pages=True to scrape all pages
-    products = scrape_search_results(SEARCH_URL, all_pages=True)
+    products = scrape_search_results(search_url, all_pages=True)
     save_to_json(products, filename="products.json")
     print("Scraped and saved successfully.")
