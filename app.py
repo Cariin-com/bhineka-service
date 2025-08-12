@@ -25,6 +25,7 @@ class ProductResponse(BaseModel):
     estimate: str = ""
     store_info: str = ""
     warranty: str = ""
+    src: str = ""
 
 @app.get("/")
 def read_root():

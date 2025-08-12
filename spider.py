@@ -15,7 +15,8 @@ def run_spider(url):
         availability=raw_data["availability"],
         estimate=raw_data.get("estimate", ""),
         store_info=raw_data.get("store_info", ""),
-        warranty=raw_data.get("warranty", "")
+        warranty=raw_data.get("warranty", ""),
+        src=url  # URL sumber scraping
     )
 
     return item
