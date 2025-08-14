@@ -39,25 +39,16 @@ def read_root():
         }
     }
 
-@app.post("/scrape", response_model=List[ProductResponse])
+@app.post("/scrape")
 async def scrape_products(request: ScrapingRequest):
-    """
-    Scrape products from Bhineka.com based on search query
-    """
     try:
         search_url = f"https://www.bhinneka.com/jual?cari={request.search_query}"
-        
         products = scrape_search_results(
             search_url=search_url,
             max_products=request.max_products,
             all_pages=request.all_pages,
             max_workers=request.max_workers
         )
-        
-        # Save to JSON file
-        with open("products.json", "w", encoding="utf-8") as f:
-            json.dump(products, f, indent=2, ensure_ascii=False)
-        
         return products
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Scraping failed: {str(e)}")
